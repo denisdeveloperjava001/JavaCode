@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    depends_on:
+      - db
+    build: ./
+    restart: on-failure
+    env_file: .env
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    environment:
+      - POSTGRES_URL=$POSTGRES_URL
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:14.1-alpine
+    restart: always
+    env_file: .env
+    environment:
+      - POSTGRES_USER=$POSTGRES_USER
+      - POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+    ports:
+      - $POSTGRES_LOCAL_PORT:$POSTGRES_DOCKER_PORT
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
